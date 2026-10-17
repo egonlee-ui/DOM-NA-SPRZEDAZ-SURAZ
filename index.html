@@ -1,0 +1,180 @@
+﻿<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Moja galeria zdjęć</title>
+<style>
+  :root { --bg:#f3f5f7; --panel:#fff; --ink:#1d2733; --muted:#647181; --accent:#243343; --line:#dce2e8; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:Arial,Helvetica,sans-serif; background:var(--bg); color:var(--ink); }
+  header { background:var(--accent); color:white; padding:28px clamp(16px,4vw,48px); }
+  header h1 { margin:0 0 10px; font-size:clamp(1.6rem,3vw,2.5rem); }
+  header p { margin:0; line-height:1.6; max-width:1000px; color:#e1e8ef; }
+  main { max-width:1500px; margin:0 auto; padding:22px clamp(12px,2vw,28px); }
+  .gallery { display:grid; grid-template-columns:minmax(250px, 0.9fr) minmax(0, 1.6fr); gap:20px; align-items:start; }
+  .thumb-panel, .preview-panel { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:14px; box-shadow:0 4px 18px #182b3a0b; }
+  .panel-title { margin:0 0 12px; font-size:1rem; }
+  .thumb-scroll { max-height: min(72vh, 780px); overflow-y:auto; padding:2px 5px 2px 2px; }
+  .thumb-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+  .thumb { display:block; width:100%; aspect-ratio:4/3; padding:0; overflow:hidden; border:2px solid transparent; border-radius:8px; background:#e9edf1; cursor:pointer; }
+  .thumb[aria-current="true"] { border-color:#2467a6; box-shadow:0 0 0 2px #2467a622; }
+  .thumb img { width:100%; height:100%; display:block; object-fit:cover; }
+  .preview-wrap { position:relative; display:flex; align-items:center; justify-content:center; min-height:300px; background:#111820; border-radius:10px; overflow:hidden; }
+  #mainPhoto { display:block; max-width:100%; width:100%; max-height:72vh; object-fit:contain; cursor:zoom-in; }
+  .preview-controls { display:flex; justify-content:space-between; align-items:center; gap:12px; padding-top:12px; }
+  button.control { border:1px solid var(--line); background:#fff; color:var(--ink); border-radius:8px; padding:9px 13px; cursor:pointer; font-size:1rem; }
+  button.control:hover { background:#eef3f7; }
+  #counter { color:var(--muted); font-size:.95rem; }
+  footer { max-width:1500px; margin:0 auto; padding:0 clamp(12px,2vw,28px) 28px; }
+  .contact { background:#fff; border:1px solid var(--line); border-radius:14px; padding:20px; }
+  .contact h2 { margin:0 0 12px; font-size:1.2rem; }
+  .contact-grid { display:flex; flex-wrap:wrap; gap:10px 28px; }
+  .contact p { margin:0; line-height:1.6; }
+  .contact a { color:#205e93; }
+  .hint { color:var(--muted); font-size:.88rem; margin:12px 0 0; }
+  .lightbox { position:fixed; inset:0; z-index:10; display:none; background:#000e; align-items:center; justify-content:center; padding:24px; }
+  .lightbox.open { display:flex; }
+  .lightbox img { max-width:92vw; max-height:88vh; object-fit:contain; }
+  .lightbox button { position:absolute; border:0; background:#ffffffdf; color:#111; border-radius:50%; width:44px; height:44px; font-size:1.5rem; cursor:pointer; }
+  #closeLightbox { top:18px; right:18px; }
+  #prevLightbox { left:18px; top:50%; transform:translateY(-50%); }
+  #nextLightbox { right:18px; top:50%; transform:translateY(-50%); }
+  @media (max-width:720px) {
+    .gallery { grid-template-columns:1fr; }
+    .preview-panel { grid-row:1; }
+    .thumb-scroll { max-height:320px; }
+    .thumb-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+    #mainPhoto { max-height:55vh; }
+    .preview-wrap { min-height:220px; }
+  } #pageDescription {
+    font-size: 22px;
+    font-weight: bold;
+    line-height: 1.4;
+    text-align: center;
+    width: 100%;
+    margin: 0;
+</style>
+</head>
+<body>
+<header>
+    <p id="pageDescription">WITAM jest to oferta prywatna.DOM w SURAŻU-DO UKOŃCZENIA BUDOWA</p>
+</header>
+<main>
+  <section class="gallery" aria-label="Galeria zdjęć">
+    <aside class="thumb-panel">
+      <h2 class="panel-title">Wybierz zdjęcie</h2>
+      <div class="thumb-scroll"><div id="thumbGrid" class="thumb-grid"></div></div>
+    </aside>
+    <section class="preview-panel">
+      <h2 class="panel-title">Podgląd zdjęcia</h2>
+      <div class="preview-wrap">
+        <img id="mainPhoto" src="zdjecia/zdjecie01.jpg" alt="Wybrane zdjęcie" title="Kliknij, aby powiększyć">
+      </div>
+      <div class="preview-controls">
+        <button class="control" id="prevBtn" type="button" aria-label="Poprzednie zdjęcie">← Poprzednie</button>
+        <span id="counter" aria-live="polite">1 / 18</span>
+        <button class="control" id="nextBtn" type="button" aria-label="Następne zdjęcie">Następne →</button>
+      </div>
+      <p class="hint">Kliknij miniaturę, aby zmienić podgląd. Kliknij duże zdjęcie, aby je powiększyć.</p>
+    </section>
+  </section>
+</main>
+<footer>
+  <section class="contact">
+    <h2>Kontakt</h2>
+    <div class="contact-grid">
+      <p>Telefon: <a href="tel:+48666466184" id="phoneLink">666 466 184</a></p>
+      <p>Facebook: <a href="https://www.facebook.com/share/196cLegpK7/" target="_blank" rel="noopener noreferrer">Napisz do mnie przez Facebooka</a></p>
+      <p>WhatsApp: <a href="https://wa.me/48666466184" target="_blank" rel="noopener noreferrer">Napisz do mnie przez WhatsApp</a></p>
+      <p>Miejscowość: <span id="locationText">SURAŻ</span></p>
+    </div>
+    <p class="hint">Przed publikacją zmień przykładowy tytuł, opis i dane kontaktowe w pliku index.html.</p>
+  </section>
+</footer>
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Powiększone zdjęcie">
+  <button id="closeLightbox" type="button" aria-label="Zamknij">×</button>
+  <button id="prevLightbox" type="button" aria-label="Poprzednie zdjęcie">‹</button>
+  <img id="lightboxPhoto" src="" alt="Powiększone zdjęcie">
+  <button id="nextLightbox" type="button" aria-label="Następne zdjęcie">›</button>
+</div>
+<script>
+(function () {
+  var photos = [], i;
+  for (i = 1; i <= 18; i++) {
+    var n = (i < 10 ? "0" : "") + i;
+    photos.push({src: "zdjecia/zdjecie" + n + ".jpg", alt: "Zdjęcie " + i});
+  }
+  var current = 0;
+  var grid = document.getElementById("thumbGrid");
+  var main = document.getElementById("mainPhoto");
+  var counter = document.getElementById("counter");
+  var lightbox = document.getElementById("lightbox");
+  var lightboxPhoto = document.getElementById("lightboxPhoto");
+  var buttons = [];
+
+  function showPhoto(index) {
+    current = (index + photos.length) % photos.length;
+    var photo = photos[current];
+    main.src = photo.src;
+    main.alt = photo.alt;
+    counter.textContent = (current + 1) + " / " + photos.length;
+    for (var j = 0; j < buttons.length; j++) {
+      buttons[j].setAttribute("aria-current", j === current ? "true" : "false");
+    }
+    lightboxPhoto.src = photo.src;
+    lightboxPhoto.alt = photo.alt;
+  }
+
+  for (i = 0; i < photos.length; i++) {
+    (function (index) {
+      var photo = photos[index];
+      var button = document.createElement("button");
+      var img = document.createElement("img");
+      button.className = "thumb";
+      button.type = "button";
+      button.setAttribute("aria-label", "Pokaż zdjęcie " + (index + 1));
+      button.setAttribute("aria-current", index === 0 ? "true" : "false");
+      img.src = photo.src;
+      img.alt = photo.alt;
+      img.onerror = function () {
+        img.style.visibility = "hidden";
+        button.style.background = "#e9edf1";
+        button.title = "Nie znaleziono pliku " + photo.src;
+      };
+      button.appendChild(img);
+      button.onclick = function () { showPhoto(index); };
+      grid.appendChild(button);
+      buttons.push(button);
+    })(i);
+  }
+
+  function openLightbox() {
+    lightbox.className = "lightbox open";
+    lightboxPhoto.src = photos[current].src;
+    document.getElementById("closeLightbox").focus();
+  }
+  function closeLightbox() { lightbox.className = "lightbox"; }
+
+  document.getElementById("prevBtn").onclick = function () { showPhoto(current - 1); };
+  document.getElementById("nextBtn").onclick = function () { showPhoto(current + 1); };
+  main.onclick = openLightbox;
+  document.getElementById("closeLightbox").onclick = closeLightbox;
+  document.getElementById("prevLightbox").onclick = function () { showPhoto(current - 1); };
+  document.getElementById("nextLightbox").onclick = function () { showPhoto(current + 1); };
+  lightbox.onclick = function (event) {
+    event = event || window.event;
+    if (event.target === lightbox) closeLightbox();
+  };
+  document.onkeydown = function (event) {
+    event = event || window.event;
+    var key = event.key || event.keyCode;
+    if (key === "Escape" || key === "Esc" || key === 27) closeLightbox();
+    if (lightbox.className.indexOf("open") !== -1 && (key === "ArrowLeft" || key === 37)) showPhoto(current - 1);
+    if (lightbox.className.indexOf("open") !== -1 && (key === "ArrowRight" || key === 39)) showPhoto(current + 1);
+  };
+  showPhoto(0);
+})();
+</script>
+</body>
+</html>
